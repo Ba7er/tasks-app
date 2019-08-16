@@ -17,12 +17,35 @@ const task = new Task({
     res.status(400).send(e);
   }
 });
-
+// Filtering data
+// GET /tasks?completed=false
+// support pagination   GET /tasks?limit=50&skip=
+// sorting data GET /tasks?sortBy=createdAt_asc_desc
 router.get("/tasks", auth, async (req, res) => {
+  // using match variable as a short hand property 
+  const match= {}
+  const sort ={ }
+
+  if(req.query.completed){
+    match.completed = req.query.completed ==='true'
+  }
+
+  if(req.query.sortBy){
+    const parts = req.query.sortBy.split(':')
+    sort[parts[0]] = parts[1] ==='desc' ? -1 : 1 
+  }
   try {
     //const tasks = await Task.find({owner: req.user._id});
     //or
-     await req.user.populate('tasks').execPopulate()
+     await req.user.populate({
+        path:'tasks',
+        match ,
+        options: {
+          limit : parseInt(req.query.limit), // if no value , mongoose will ignore and considre it as 0 
+          skip: parseInt(req.query.skip),
+          sort 
+        }
+     }).execPopulate()
       //console.log(x)
       res.send(req.user.tasks);
   } catch (e) {
