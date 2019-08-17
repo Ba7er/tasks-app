@@ -4,7 +4,7 @@ const userRouter = require("./routers/user");
 const taskRouter = require("./routers/task");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT;
 //make sure to decalre the middelware before anu 'app.use' statement
 // below app.user is express middelware .... means 
 // new http request ---> middelware to do something ---> request handler 
