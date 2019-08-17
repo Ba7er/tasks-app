@@ -4,6 +4,7 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 const multer = require('multer')
 const sharp = require('sharp')
+const {sendWelcomEmail,sendCancelEmail} = require('../emails/account')
 
 
 
@@ -18,6 +19,7 @@ router.post("/users", async (req, res) => {
 
   try {
     await user.save();
+    sendWelcomEmail(user.email, user.name)
     const token = await user.generateAuthtoken(
       req.body.email,
       req.body.password
@@ -107,6 +109,7 @@ router.delete("/users/me", auth, async (req, res) => {
     //   return res.status(404).send();
     // }
     await req.user.remove();
+    sendCancelEmail(req.user.email, req.user.name)
     
     res.send(req.user);
   } catch (e) {
